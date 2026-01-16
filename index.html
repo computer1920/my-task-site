@@ -1,332 +1,758 @@
 <!doctype html>
 <html lang="bn">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>My Task Site</title>
-  <style>
-    :root{
-      --bg:#0b1220; --card:#101a33; --muted:#92a2c7; --text:#e9eeff;
-      --accent:#7c5cff; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-      --border:rgba(255,255,255,.10);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background: radial-gradient(1000px 600px at 20% -10%, rgba(124,92,255,.35), transparent 55%),
-                  radial-gradient(900px 500px at 100% 10%, rgba(34,197,94,.18), transparent 55%),
-                  var(--bg);
-      color:var(--text);
-    }
-    .wrap{max-width:1050px;margin:0 auto;padding:28px 18px 60px}
-    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
-    .brand{display:flex;flex-direction:column;gap:4px}
-    .brand h1{margin:0;font-size:20px;letter-spacing:.2px}
-    .brand p{margin:0;color:var(--muted);font-size:13px}
-    .btn{
-      border:1px solid var(--border); background:rgba(255,255,255,.06);
-      color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer;
-      font-weight:600; transition:.15s;
-    }
-    .btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.10)}
-    .btn.primary{background:var(--accent); border-color:transparent}
-    .btn.primary:hover{filter:brightness(1.05)}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-    .card{
-      border:1px solid var(--border); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border-radius:18px; padding:14px;
-      backdrop-filter: blur(8px);
-    }
-    .stats{grid-column:span 12; display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
-    .stat h3{margin:0;font-size:12px;color:var(--muted);font-weight:600}
-    .stat .n{margin-top:8px;font-size:24px;font-weight:800}
-    .toolbar{grid-column:span 12; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between}
-    .left, .right{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    input, select, textarea{
-      border:1px solid var(--border); background:rgba(0,0,0,.25);
-      color:var(--text); padding:10px 12px; border-radius:12px; outline:none;
-    }
-    input::placeholder, textarea::placeholder{color:rgba(233,238,255,.45)}
-    .list{grid-column:span 12}
-    .task{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; padding:12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.18); margin-top:10px}
-    .task .meta{display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:12px}
-    .pill{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--border)}
-    .p-high{border-color:rgba(239,68,68,.55); color:#fecaca}
-    .p-med{border-color:rgba(245,158,11,.55); color:#fde68a}
-    .p-low{border-color:rgba(34,197,94,.55); color:#bbf7d0}
-    .title{font-weight:800}
-    .notes{color:var(--muted); margin-top:4px; font-size:13px}
-    .actions{display:flex; gap:8px; align-items:center}
-    .iconbtn{padding:8px 10px;border-radius:12px}
-    .done .title{text-decoration:line-through; opacity:.75}
-    .badgeOver{color:#fecaca}
-    .badgeToday{color:#c7d2fe}
-    .badgeSoon{color:#fde68a}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Task Site</title>
 
-    /* modal */
-    .modalBack{
-      position:fixed; inset:0; background:rgba(0,0,0,.55);
-      display:none; align-items:center; justify-content:center; padding:16px;
-    }
-    .modal{max-width:520px; width:100%}
-    .modal h2{margin:0 0 10px 0}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    .row > *{width:100%}
-    textarea{min-height:90px; resize:vertical}
-    .modalFooter{display:flex; justify-content:flex-end; gap:10px; margin-top:12px}
-    @media (max-width:780px){
-      .stats{grid-template-columns:repeat(2,1fr)}
-      .row{grid-template-columns:1fr}
-    }
-  </style>
+<style>
+:root{
+  --bg:#ffffff;
+  --card:#f8fafc;
+  --border:#e5e7eb;
+  --text:#111827;
+  --muted:#6b7280;
+  --accent:#6366f1;
+  --done:#16a34a;
+  --over:#dc2626;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Roboto;
+  background:var(--bg);
+  color:var(--text);
+}
+.wrap{max-width:1100px;margin:auto;padding:24px}
+h1{margin:0}
+.small{font-size:12px;color:var(--muted)}
+button,input,textarea,select{
+  background:white;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 12px;
+}
+button{cursor:pointer}
+button.primary{background:var(--accent);color:white;border:none}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.task{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+}
+.user-btn{padding:6px 10px;font-size:12px}
+.user-done{background:var(--done);color:white;border:none}
+.overdue{border-color:var(--over)}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--muted);
+  margin-left:6px;
+}
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.35);
+  display:none;align-items:center;justify-content:center;
+  padding:14px;
+}
+.modal-box{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+  width:100%;
+  max-width:460px;
+}
+hr{border:none;border-top:1px solid var(--border);margin:12px 0}
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <h1>My Task Site</h1>
-        <p>লোকাল স্টোরেজে সেভ হয়। মানে তুমি ডিলিট না করা পর্যন্ত ভুলবে না।</p>
+
+<!-- 🔐 LOCK SCREEN -->
+<div id="lock" class="modal" style="display:flex">
+  <div class="modal-box">
+    <h3 style="margin-top:0">🔐 Private Mode</h3>
+
+    <div id="lockModeNew" style="display:none">
+      <p class="small">প্রথমবার ব্যবহার: একটা PIN সেট করো (কমপক্ষে 4 ডিজিট)।</p>
+      <input id="pinNew" type="password" placeholder="New PIN" style="width:100%;margin-bottom:8px">
+      <button class="primary" id="btnSetPin">Set PIN</button>
+    </div>
+
+    <div id="lockModeEnter" style="display:none">
+      <p class="small">PIN না দিলে ভিতরে ঢোকা যাবে না।</p>
+      <input id="pinEnter" type="password" placeholder="Enter PIN" style="width:100%;margin-bottom:8px">
+      <div class="row">
+        <button class="primary" id="btnUnlock">Unlock</button>
+        <button id="btnChangePin">Change PIN</button>
       </div>
-      <button class="btn primary" id="openModal">+ Add Task</button>
-    </header>
 
-    <div class="grid">
-      <section class="stats">
-        <div class="card stat">
-          <h3>Total</h3><div class="n" id="sTotal">0</div>
-        </div>
-        <div class="card stat">
-          <h3>Today</h3><div class="n" id="sToday">0</div>
-        </div>
-        <div class="card stat">
-          <h3>Overdue</h3><div class="n" id="sOverdue">0</div>
-        </div>
-        <div class="card stat">
-          <h3>Completed</h3><div class="n" id="sDone">0</div>
-        </div>
-      </section>
+      <div id="changePinBox" style="display:none;margin-top:10px">
+        <hr>
+        <p class="small">PIN change করতে পুরোনো PIN লাগবে।</p>
+        <input id="pinOld" type="password" placeholder="Old PIN" style="width:100%;margin-bottom:6px">
+        <input id="pinNew2" type="password" placeholder="New PIN" style="width:100%;margin-bottom:8px">
+        <button class="primary" id="btnSaveNewPin">Save New PIN</button>
+      </div>
+    </div>
 
-      <section class="card toolbar">
-        <div class="left">
-          <input id="search" placeholder="Search task title..." />
-          <select id="filter">
-            <option value="all">All</option>
-            <option value="today">Today</option>
-            <option value="overdue">Overdue</option>
-            <option value="done">Completed</option>
-            <option value="todo">To-do</option>
-          </select>
-        </div>
-        <div class="right">
-          <select id="sort">
-            <option value="createdDesc">Newest</option>
-            <option value="dueAsc">Due date (soon first)</option>
-            <option value="prioDesc">Priority (high first)</option>
-          </select>
-          <button class="btn" id="clearDone">Clear Completed</button>
-        </div>
-      </section>
+  </div>
+</div>
 
-      <section class="card list">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:800">Tasks</div>
-          <div style="color:var(--muted);font-size:12px" id="hint">Saved in this browser</div>
-        </div>
-        <div id="tasks"></div>
-      </section>
+<div class="wrap" id="app" style="display:none">
+
+<header class="card">
+  <div class="row" style="justify-content:space-between;align-items:center">
+    <div>
+      <h1>My Task Site</h1>
+      <p class="small">Owner + Category + Points + Countdown + Reminder + Lock (LocalStorage)</p>
+    </div>
+
+    <div class="row" style="align-items:center">
+      <button id="btnNotif">🔔 Enable reminders</button>
+      <button class="primary" onclick="openModal()">➕ Add Task</button>
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="modalBack" id="modalBack">
-    <div class="card modal">
-      <h2>Add a task</h2>
-      <div style="display:grid;gap:10px">
-        <input id="tTitle" placeholder="Task title (required)" />
-        <textarea id="tNotes" placeholder="Notes (optional)"></textarea>
-        <div class="row">
-          <input id="tDue" type="date" />
-          <select id="tPrio">
-            <option value="low">Low</option>
-            <option value="med" selected>Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-      </div>
-      <div class="modalFooter">
-        <button class="btn" id="closeModal">Cancel</button>
-        <button class="btn primary" id="saveTask">Save</button>
+  <div class="row" style="margin-top:12px">
+    <div class="card">Total<br><b id="sTotal">0</b></div>
+    <div class="card">Today<br><b id="sToday">0</b></div>
+    <div class="card">Overdue<br><b id="sOverdue">0</b></div>
+    <div class="card">Completed<br><b id="sCompleted">0</b></div>
+  </div>
+
+  <div class="row" style="margin-top:12px">
+    <div class="card">🙂 You<br>Done: <span id="hDone">0</span><br>Points: <b id="hPoints">0</b></div>
+    <div class="card">👩 Wife<br>Done: <span id="wDone">0</span><br>Points: <b id="wPoints">0</b></div>
+  </div>
+</header>
+
+<div class="card" style="margin-top:16px">
+  <b>Tasks</b>
+  <div id="tasks"></div>
+</div>
+
+</div>
+
+<!-- ADD TASK MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3 style="margin-top:0">Add Task</h3>
+
+    <input id="title" placeholder="Task title (required)" style="width:100%;margin-bottom:6px">
+    <textarea id="notes" placeholder="Notes (optional)" style="width:100%;margin-bottom:6px"></textarea>
+
+    <div class="row" style="margin-bottom:6px">
+      <select id="owner" style="flex:1;min-width:180px">
+        <option value="both" selected>👨👩 Both (Shared)</option>
+        <option value="husband">🙂 You</option>
+        <option value="wife">👩 Wife</option>
+      </select>
+
+      <!-- ✅ CATEGORY (dynamic + add new) -->
+      <select id="category" style="flex:1;min-width:180px"></select>
+    </div>
+
+    <!-- ✅ Add new category box -->
+    <div id="newCategoryBox" style="display:none;margin-bottom:6px">
+      <input id="newCategoryInput" placeholder="New category name" style="width:100%">
+      <div class="row" style="margin-top:6px">
+        <button class="primary" id="btnAddCategory">Add Category</button>
+        <button id="btnCancelCategory">Cancel</button>
       </div>
     </div>
+
+    <input id="due" type="datetime-local" style="width:100%;margin-bottom:8px">
+
+    <label class="small" style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <input type="checkbox" id="reminder">
+      Smart reminder (30 / 10 / 5 min আগে)
+    </label>
+
+    <div class="row">
+      <button class="primary" id="btnSaveTask">Save</button>
+      <button id="btnCancelTask">Cancel</button>
+    </div>
   </div>
+</div>
 
 <script>
-  const $ = (id) => document.getElementById(id);
-  const STORAGE_KEY = "my_task_site_v1";
+/* =========================
+   STORAGE KEYS
+========================= */
+const PIN_KEY = "site_pin_v1";
+const POINTS_KEY = "points";
+const STORAGE_NEW = "couple_tasks_all_v1";
 
-  const state = {
-    tasks: load(),
-    search: "",
-    filter: "all",
-    sort: "createdDesc",
-  };
+/* ✅ Categories key */
+const CAT_KEY = "couple_categories_v1";
+const DEFAULT_CATEGORIES = ["General","Home","Work","Personal","Health"];
 
-  function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+// Old keys (migration attempt)
+const STORAGE_OLD_KEYS = [
+  "couple_tasks_OWNER",
+  "couple_tasks_FINAL_MERGED",
+  "couple_tasks_STABLE",
+  "couple_tasks_white",
+  "couple_tasks_final",
+  "couple_tasks_v2",
+  "couple_tasks_v1",
+  "couple_tasks_FULL"
+];
 
-  function load(){
-    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
-    catch{ return []; }
+/* =========================
+   DOM BINDING
+========================= */
+const lock = document.getElementById("lock");
+const app = document.getElementById("app");
+
+const lockModeNew = document.getElementById("lockModeNew");
+const lockModeEnter = document.getElementById("lockModeEnter");
+const changePinBox = document.getElementById("changePinBox");
+
+const pinNew = document.getElementById("pinNew");
+const pinEnter = document.getElementById("pinEnter");
+const pinOld = document.getElementById("pinOld");
+const pinNew2 = document.getElementById("pinNew2");
+
+const btnSetPin = document.getElementById("btnSetPin");
+const btnUnlock = document.getElementById("btnUnlock");
+const btnChangePin = document.getElementById("btnChangePin");
+const btnSaveNewPin = document.getElementById("btnSaveNewPin");
+
+const btnNotif = document.getElementById("btnNotif");
+
+const modal = document.getElementById("modal");
+const btnSaveTask = document.getElementById("btnSaveTask");
+const btnCancelTask = document.getElementById("btnCancelTask");
+
+const titleInput = document.getElementById("title");
+const notesInput = document.getElementById("notes");
+const ownerSelect = document.getElementById("owner");
+const categorySelect = document.getElementById("category");
+const dueInput = document.getElementById("due");
+const reminderInput = document.getElementById("reminder");
+
+const newCategoryBox = document.getElementById("newCategoryBox");
+const newCategoryInput = document.getElementById("newCategoryInput");
+const btnAddCategory = document.getElementById("btnAddCategory");
+const btnCancelCategory = document.getElementById("btnCancelCategory");
+
+const tasksDiv = document.getElementById("tasks");
+
+const sTotal = document.getElementById("sTotal");
+const sToday = document.getElementById("sToday");
+const sOverdue = document.getElementById("sOverdue");
+const sCompleted = document.getElementById("sCompleted");
+const hDone = document.getElementById("hDone");
+const wDone = document.getElementById("wDone");
+const hPoints = document.getElementById("hPoints");
+const wPoints = document.getElementById("wPoints");
+
+/* =========================
+   DATA
+========================= */
+let tasks = [];
+let points = { husband: 0, wife: 0 };
+
+/* ✅ categories list */
+let categories = [];
+
+function loadPoints(){
+  try{
+    const p = JSON.parse(localStorage.getItem(POINTS_KEY) || '{"husband":0,"wife":0}');
+    points = { husband: Number(p.husband||0), wife: Number(p.wife||0) };
+  }catch{
+    points = { husband:0, wife:0 };
   }
-  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks)); }
+}
+function savePoints(){
+  localStorage.setItem(POINTS_KEY, JSON.stringify(points));
+}
 
-  function todayISO(){
-    const d = new Date();
-    const off = d.getTimezoneOffset();
-    const local = new Date(d.getTime() - off * 60 * 1000);
-    return local.toISOString().slice(0,10);
-  }
-
-  function isOverdue(task){
-    if(!task.dueDate || task.status === "done") return false;
-    return task.dueDate < todayISO();
-  }
-  function isToday(task){
-    if(!task.dueDate || task.status === "done") return false;
-    return task.dueDate === todayISO();
-  }
-
-  function prioScore(p){ return p === "high" ? 3 : p === "med" ? 2 : 1; }
-
-  function badge(task){
-    if(task.status === "done") return "";
-    if(isOverdue(task)) return `<span class="badgeOver">Overdue</span>`;
-    if(isToday(task)) return `<span class="badgeToday">Today</span>`;
-    if(task.dueDate){
-      const t = new Date(todayISO());
-      const d = new Date(task.dueDate);
-      const diff = Math.round((d - t) / (1000*60*60*24));
-      if(diff <= 3) return `<span class="badgeSoon">Due soon</span>`;
-    }
-    return "";
-  }
-
-  function render(){
-    const tasksEl = $("tasks");
-    tasksEl.innerHTML = "";
-
-    const q = state.search.trim().toLowerCase();
-    let list = [...state.tasks];
-
-    if(q) list = list.filter(t => t.title.toLowerCase().includes(q));
-
-    if(state.filter === "today") list = list.filter(isToday);
-    else if(state.filter === "overdue") list = list.filter(isOverdue);
-    else if(state.filter === "done") list = list.filter(t => t.status === "done");
-    else if(state.filter === "todo") list = list.filter(t => t.status !== "done");
-
-    if(state.sort === "createdDesc") list.sort((a,b)=> b.createdAt - a.createdAt);
-    if(state.sort === "dueAsc") list.sort((a,b)=> (a.dueDate || "9999-12-31").localeCompare(b.dueDate || "9999-12-31"));
-    if(state.sort === "prioDesc") list.sort((a,b)=> prioScore(b.priority) - prioScore(a.priority));
-
-    if(list.length === 0){
-      tasksEl.innerHTML = `<div style="padding:14px;color:var(--muted)">No tasks found.</div>`;
-    } else {
-      for(const t of list){
-        const pClass = t.priority === "high" ? "p-high" : t.priority === "med" ? "p-med" : "p-low";
-        const due = t.dueDate ? `Due: ${t.dueDate}` : "No due date";
-        const doneClass = t.status === "done" ? "done" : "";
-        tasksEl.insertAdjacentHTML("beforeend", `
-          <div class="task ${doneClass}">
-            <div style="min-width:0">
-              <div class="title">${escapeHtml(t.title)}</div>
-              ${t.notes ? `<div class="notes">${escapeHtml(t.notes)}</div>` : ""}
-              <div class="meta">
-                <span class="pill ${pClass}">${t.priority.toUpperCase()}</span>
-                <span class="pill">${due}</span>
-                ${badge(t) ? `<span class="pill">${badge(t)}</span>` : ""}
-              </div>
-            </div>
-            <div class="actions">
-              <button class="btn iconbtn" title="Toggle done" onclick="toggleDone('${t.id}')">${t.status==="done"?"↩":"✓"}</button>
-              <button class="btn iconbtn" title="Delete" onclick="delTask('${t.id}')">🗑</button>
-            </div>
-          </div>
-        `);
+function loadCategories(){
+  try{
+    const raw = localStorage.getItem(CAT_KEY);
+    if(raw){
+      const arr = JSON.parse(raw);
+      if(Array.isArray(arr) && arr.length){
+        categories = arr.map(x=>String(x)).filter(Boolean);
+      }else{
+        categories = [...DEFAULT_CATEGORIES];
       }
+    }else{
+      categories = [...DEFAULT_CATEGORIES];
     }
-
-    // stats
-    $("sTotal").textContent = state.tasks.length;
-    $("sDone").textContent = state.tasks.filter(t=>t.status==="done").length;
-    $("sOverdue").textContent = state.tasks.filter(isOverdue).length;
-    $("sToday").textContent = state.tasks.filter(isToday).length;
+  }catch{
+    categories = [...DEFAULT_CATEGORIES];
   }
 
-  function escapeHtml(s){
-    return (s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // Deduplicate
+  categories = Array.from(new Set(categories));
+  saveCategories();
+}
+
+function saveCategories(){
+  localStorage.setItem(CAT_KEY, JSON.stringify(categories));
+}
+
+function ensureCategoryExists(cat){
+  const c = (cat || "").trim();
+  if(!c) return "General";
+  if(!categories.includes(c)){
+    categories.push(c);
+    categories = Array.from(new Set(categories));
+    saveCategories();
   }
+  return c;
+}
 
-  // actions
-  window.toggleDone = (id) => {
-    const t = state.tasks.find(x=>x.id===id);
-    if(!t) return;
-    t.status = t.status === "done" ? "todo" : "done";
-    save(); render();
-  };
+function renderCategoriesDropdown(){
+  const current = categorySelect.value || "General";
 
-  window.delTask = (id) => {
-    state.tasks = state.tasks.filter(t=>t.id!==id);
-    save(); render();
-  };
-
-  function openModal(){
-    $("modalBack").style.display = "flex";
-    $("tTitle").value = "";
-    $("tNotes").value = "";
-    $("tDue").value = "";
-    $("tPrio").value = "med";
-    setTimeout(()=> $("tTitle").focus(), 0);
-  }
-  function closeModal(){ $("modalBack").style.display = "none"; }
-
-  function addTask(){
-    const title = $("tTitle").value.trim();
-    if(!title){
-      $("tTitle").focus();
-      return;
-    }
-    const task = {
-      id: uid(),
-      title,
-      notes: $("tNotes").value.trim(),
-      dueDate: $("tDue").value || "",
-      priority: $("tPrio").value,
-      status: "todo",
-      createdAt: Date.now()
-    };
-    state.tasks.unshift(task);
-    save();
-    closeModal();
-    render();
-  }
-
-  // listeners
-  $("openModal").addEventListener("click", openModal);
-  $("closeModal").addEventListener("click", closeModal);
-  $("modalBack").addEventListener("click", (e)=>{ if(e.target.id==="modalBack") closeModal(); });
-  $("saveTask").addEventListener("click", addTask);
-
-  $("search").addEventListener("input", (e)=>{ state.search = e.target.value; render(); });
-  $("filter").addEventListener("change", (e)=>{ state.filter = e.target.value; render(); });
-  $("sort").addEventListener("change", (e)=>{ state.sort = e.target.value; render(); });
-
-  $("clearDone").addEventListener("click", ()=>{
-    state.tasks = state.tasks.filter(t=>t.status!=="done");
-    save(); render();
+  categorySelect.innerHTML = "";
+  categories.forEach(c=>{
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    categorySelect.appendChild(opt);
   });
 
-  // init
+  const addOpt = document.createElement("option");
+  addOpt.value = "__add__";
+  addOpt.textContent = "➕ Add new category";
+  categorySelect.appendChild(addOpt);
+
+  // Restore selection if possible
+  if(categories.includes(current)) categorySelect.value = current;
+  else categorySelect.value = "General";
+}
+
+categorySelect.addEventListener("change", ()=>{
+  if(categorySelect.value === "__add__"){
+    newCategoryBox.style.display = "block";
+    newCategoryInput.focus();
+  }else{
+    newCategoryBox.style.display = "none";
+  }
+});
+
+btnAddCategory.addEventListener("click", ()=>{
+  const name = (newCategoryInput.value || "").trim();
+  if(!name) return alert("Category name লিখো");
+  if(categories.includes(name)) return alert("Already exists");
+  categories.push(name);
+  categories = Array.from(new Set(categories));
+  saveCategories();
+
+  newCategoryInput.value = "";
+  newCategoryBox.style.display = "none";
+  renderCategoriesDropdown();
+  categorySelect.value = name;
+});
+
+btnCancelCategory.addEventListener("click", ()=>{
+  newCategoryInput.value = "";
+  newCategoryBox.style.display = "none";
+  // fallback selection
+  categorySelect.value = "General";
+});
+
+function normalizeTask(t){
+  const nt = {...t};
+  if(!nt.id) nt.id = Date.now() + Math.floor(Math.random()*999);
+  if(!nt.title) nt.title = "(no title)";
+  if(!nt.notes) nt.notes = "";
+  if(!nt.owner) nt.owner = "both";
+
+  // ✅ category normalize + make sure it exists in categories list
+  nt.category = ensureCategoryExists(nt.category || "General");
+
+  if(!nt.due) nt.due = "";
+  if(typeof nt.reminder !== "boolean") nt.reminder = false;
+
+  if(!nt.completedBy) nt.completedBy = {husband:false, wife:false};
+  if(typeof nt.completedBy.husband !== "boolean") nt.completedBy.husband = !!nt.completedBy.husband;
+  if(typeof nt.completedBy.wife !== "boolean") nt.completedBy.wife = !!nt.completedBy.wife;
+
+  if(!nt.reminderSent) nt.reminderSent = {m30:false, m10:false, m5:false, overdue:false};
+
+  return nt;
+}
+
+function loadTasks(){
+  let loaded = null;
+
+  // 1) new key
+  try{
+    const raw = localStorage.getItem(STORAGE_NEW);
+    if(raw) loaded = JSON.parse(raw);
+  }catch{}
+
+  // 2) migration from older keys if needed
+  if(!Array.isArray(loaded) || loaded.length === 0){
+    for(const k of STORAGE_OLD_KEYS){
+      try{
+        const raw = localStorage.getItem(k);
+        if(!raw) continue;
+        const arr = JSON.parse(raw);
+        if(Array.isArray(arr) && arr.length){
+          loaded = arr;
+          break;
+        }
+      }catch{}
+    }
+  }
+
+  tasks = Array.isArray(loaded) ? loaded.map(normalizeTask) : [];
+  saveTasks();
+}
+
+function saveTasks(){
+  localStorage.setItem(STORAGE_NEW, JSON.stringify(tasks));
+}
+
+function saveAll(){
+  saveTasks();
+  savePoints();
+}
+
+/* =========================
+   LOCK (PIN)
+========================= */
+function showLock(){
+  lock.style.display = "flex";
+  app.style.display = "none";
+}
+
+function showApp(){
+  lock.style.display = "none";
+  app.style.display = "block";
   render();
+}
+
+function initLock(){
+  const pin = localStorage.getItem(PIN_KEY);
+  showLock();
+  changePinBox.style.display = "none";
+
+  if(!pin){
+    lockModeNew.style.display = "block";
+    lockModeEnter.style.display = "none";
+  }else{
+    lockModeNew.style.display = "none";
+    lockModeEnter.style.display = "block";
+  }
+}
+
+btnSetPin.addEventListener("click", ()=>{
+  const v = (pinNew.value || "").trim();
+  if(v.length < 4) return alert("PIN কমপক্ষে 4 digit দাও।");
+  localStorage.setItem(PIN_KEY, v);
+  pinNew.value = "";
+  initLock();
+  alert("PIN সেট হয়েছে। এখন Unlock করো।");
+});
+
+btnUnlock.addEventListener("click", ()=>{
+  const pin = localStorage.getItem(PIN_KEY);
+  const v = (pinEnter.value || "").trim();
+  if(v === pin){
+    pinEnter.value = "";
+    showApp();
+  }else{
+    alert("Wrong PIN");
+  }
+});
+
+btnChangePin.addEventListener("click", ()=>{
+  changePinBox.style.display = (changePinBox.style.display === "none") ? "block" : "none";
+});
+
+btnSaveNewPin.addEventListener("click", ()=>{
+  const pin = localStorage.getItem(PIN_KEY);
+  const oldv = (pinOld.value || "").trim();
+  const newv = (pinNew2.value || "").trim();
+  if(oldv !== pin) return alert("Old PIN ভুল।");
+  if(newv.length < 4) return alert("New PIN কমপক্ষে 4 digit দাও।");
+  localStorage.setItem(PIN_KEY, newv);
+  pinOld.value = ""; pinNew2.value = "";
+  changePinBox.style.display = "none";
+  alert("PIN updated. এখন নতুন PIN দিয়ে Unlock করো।");
+  initLock();
+});
+
+/* =========================
+   MODAL
+========================= */
+function openModal(){ modal.style.display = "flex"; }
+function closeModal(){ modal.style.display = "none"; }
+
+btnCancelTask.addEventListener("click", closeModal);
+
+btnSaveTask.addEventListener("click", ()=>{
+  saveTask();
+});
+
+function resetModal(){
+  titleInput.value = "";
+  notesInput.value = "";
+  ownerSelect.value = "both";
+  // keep category selected if user wants; but ensure not __add__
+  if(categorySelect.value === "__add__") categorySelect.value = "General";
+  dueInput.value = "";
+  reminderInput.checked = false;
+  newCategoryInput.value = "";
+  newCategoryBox.style.display = "none";
+}
+
+function saveTask(){
+  const title = (titleInput.value || "").trim();
+  if(!title) return alert("Task title দরকার।");
+
+  // If user selected add-new option but didn't add
+  if(categorySelect.value === "__add__"){
+    newCategoryBox.style.display = "block";
+    return alert("নতুন category যোগ করো বা অন্য category select করো।");
+  }
+
+  const t = normalizeTask({
+    id: Date.now(),
+    title,
+    notes: (notesInput.value || "").trim(),
+    owner: ownerSelect.value,
+    category: categorySelect.value,
+    due: dueInput.value,
+    reminder: !!reminderInput.checked,
+    completedBy: {husband:false, wife:false},
+    reminderSent: {m30:false, m10:false, m5:false, overdue:false}
+  });
+
+  tasks.unshift(t);
+  saveTasks();
+
+  resetModal();
+  closeModal();
+  render();
+}
+
+/* =========================
+   HELPERS
+========================= */
+function friendlyDate(d){
+  return new Date(d).toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"});
+}
+function remainingTime(d){
+  const diff = new Date(d) - new Date();
+  const min = Math.round(diff/60000);
+  if(min < 0) return `⛔ Overdue by ${Math.abs(min)} min`;
+  if(min < 60) return `⏳ Remaining ${min} min`;
+  return `⏳ Remaining ${Math.floor(min/60)} hr ${min%60} min`;
+}
+function ownerBadge(owner){
+  if(owner==="husband") return `<span class="badge">🙂 You</span>`;
+  if(owner==="wife") return `<span class="badge">👩 Wife</span>`;
+  return `<span class="badge">👨👩 Shared</span>`;
+}
+function categoryBadge(cat){
+  return `<span class="badge">${cat}</span>`;
+}
+
+function isCompleted(t){
+  if(t.owner==="both") return t.completedBy.husband && t.completedBy.wife;
+  if(t.owner==="husband") return t.completedBy.husband;
+  if(t.owner==="wife") return t.completedBy.wife;
+  return false;
+}
+function isOverdue(t){
+  if(!t.due) return false;
+  if(isCompleted(t)) return false;
+  const due = new Date(t.due);
+  return due < new Date();
+}
+
+/* =========================
+   TOGGLE + POINTS
+========================= */
+function toggleUser(id,user){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+
+  if(t.owner==="husband" && user!=="husband") return;
+  if(t.owner==="wife" && user!=="wife") return;
+
+  if(!t.completedBy[user]){
+    t.completedBy[user] = true;
+    points[user] += 10;
+  }else{
+    t.completedBy[user] = false;
+    points[user] -= 10;
+  }
+
+  saveAll();
+  render();
+}
+
+/* =========================
+   STATS
+========================= */
+function updateStats(){
+  sTotal.textContent = tasks.length;
+  sToday.textContent = tasks.filter(t=>t.due && new Date(t.due).toDateString()===new Date().toDateString()).length;
+  sOverdue.textContent = tasks.filter(t=>isOverdue(t)).length;
+  sCompleted.textContent = tasks.filter(t=>isCompleted(t)).length;
+
+  hDone.textContent = tasks.filter(t=>{
+    if(t.owner==="husband") return t.completedBy.husband;
+    if(t.owner==="both") return t.completedBy.husband;
+    return false;
+  }).length;
+
+  wDone.textContent = tasks.filter(t=>{
+    if(t.owner==="wife") return t.completedBy.wife;
+    if(t.owner==="both") return t.completedBy.wife;
+    return false;
+  }).length;
+
+  hPoints.textContent = points.husband;
+  wPoints.textContent = points.wife;
+}
+
+/* =========================
+   REMINDERS
+========================= */
+function ensureNotificationPermission(){
+  if(!("Notification" in window)){
+    alert("এই ব্রাউজারে Notification সাপোর্ট নেই।");
+    return;
+  }
+  Notification.requestPermission().then(p=>{
+    if(p==="granted"){
+      alert("Reminders enabled ✅");
+    }else{
+      alert("Notification blocked. Browser settings থেকে Allow করতে হবে।");
+    }
+  });
+}
+btnNotif.addEventListener("click", ensureNotificationPermission);
+
+function maybeNotify(t, key, text){
+  if(!t.reminderSent) t.reminderSent = {m30:false,m10:false,m5:false,overdue:false};
+  if(t.reminderSent[key]) return false;
+
+  new Notification("🔔 Task Reminder", { body: text });
+  t.reminderSent[key] = true;
+  return true;
+}
+
+function checkReminders(){
+  if(!("Notification" in window)) return;
+  if(Notification.permission !== "granted") return;
+
+  const now = new Date();
+  let changed = false;
+
+  for(const t of tasks){
+    if(!t.reminder) continue;
+    if(!t.due) continue;
+    if(isCompleted(t)) continue;
+
+    const due = new Date(t.due);
+    const min = Math.round((due - now)/60000);
+
+    if(min <= 30 && min >= 29){
+      changed = maybeNotify(t, "m30", `${t.title} — 30 minutes left`) || changed;
+    }
+    if(min <= 10 && min >= 9){
+      changed = maybeNotify(t, "m10", `${t.title} — 10 minutes left`) || changed;
+    }
+    if(min <= 5 && min >= 4){
+      changed = maybeNotify(t, "m5", `${t.title} — 5 minutes left`) || changed;
+    }
+
+    if(min < 0){
+      if(!t.reminderSent.overdue){
+        changed = maybeNotify(t, "overdue", `${t.title} — Overdue`) || changed;
+      }
+    }
+  }
+
+  if(changed) saveTasks();
+}
+
+/* =========================
+   RENDER
+========================= */
+function render(){
+  tasksDiv.innerHTML = "";
+
+  for(const t of tasks){
+    const overdue = isOverdue(t);
+
+    const showH = (t.owner==="both" || t.owner==="husband");
+    const showW = (t.owner==="both" || t.owner==="wife");
+
+    tasksDiv.innerHTML += `
+      <div class="task ${overdue ? "overdue" : ""}">
+        <div>
+          <b>${t.title}</b>
+          ${ownerBadge(t.owner)}
+          ${categoryBadge(t.category)}
+        </div>
+
+        ${t.notes ? `<div class="small">${t.notes}</div>` : ""}
+
+        <div class="small">🕒 ${t.due ? friendlyDate(t.due) : "No expiry"}</div>
+        ${t.due ? `<div class="small">${remainingTime(t.due)}</div>` : ""}
+
+        <div class="row" style="margin-top:8px">
+          ${showH ? `
+            <button class="user-btn ${t.completedBy.husband ? "user-done" : ""}"
+              onclick="toggleUser(${t.id},'husband')">🙂 ${t.completedBy.husband ? "Done" : "Pending"}</button>
+          ` : ""}
+
+          ${showW ? `
+            <button class="user-btn ${t.completedBy.wife ? "user-done" : ""}"
+              onclick="toggleUser(${t.id},'wife')">👩 ${t.completedBy.wife ? "Done" : "Pending"}</button>
+          ` : ""}
+        </div>
+
+        ${t.reminder ? `<div class="small">🔔 Reminder: ON</div>` : `<div class="small">🔕 Reminder: OFF</div>`}
+      </div>
+    `;
+  }
+
+  updateStats();
+}
+
+/* =========================
+   INIT
+========================= */
+loadPoints();
+loadCategories();
+renderCategoriesDropdown();
+loadTasks();             // normalizeTask will also ensureCategoryExists for any old tasks
+renderCategoriesDropdown(); // refresh in case tasks introduced new categories
+initLock();
+
+// Keep countdown + reminders fresh
+setInterval(()=>{ if(app.style.display==="block") render(); }, 60000);
+setInterval(()=>{ if(app.style.display==="block") checkReminders(); }, 60000);
 </script>
+
 </body>
 </html>
