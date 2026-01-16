@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Task Site</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#101a33; --muted:#92a2c7; --text:#e9eeff;
+      --accent:#7c5cff; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+      --border:rgba(255,255,255,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: radial-gradient(1000px 600px at 20% -10%, rgba(124,92,255,.35), transparent 55%),
+                  radial-gradient(900px 500px at 100% 10%, rgba(34,197,94,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:1050px;margin:0 auto;padding:28px 18px 60px}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;flex-direction:column;gap:4px}
+    .brand h1{margin:0;font-size:20px;letter-spacing:.2px}
+    .brand p{margin:0;color:var(--muted);font-size:13px}
+    .btn{
+      border:1px solid var(--border); background:rgba(255,255,255,.06);
+      color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer;
+      font-weight:600; transition:.15s;
+    }
+    .btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.10)}
+    .btn.primary{background:var(--accent); border-color:transparent}
+    .btn.primary:hover{filter:brightness(1.05)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .card{
+      border:1px solid var(--border); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border-radius:18px; padding:14px;
+      backdrop-filter: blur(8px);
+    }
+    .stats{grid-column:span 12; display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+    .stat h3{margin:0;font-size:12px;color:var(--muted);font-weight:600}
+    .stat .n{margin-top:8px;font-size:24px;font-weight:800}
+    .toolbar{grid-column:span 12; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between}
+    .left, .right{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    input, select, textarea{
+      border:1px solid var(--border); background:rgba(0,0,0,.25);
+      color:var(--text); padding:10px 12px; border-radius:12px; outline:none;
+    }
+    input::placeholder, textarea::placeholder{color:rgba(233,238,255,.45)}
+    .list{grid-column:span 12}
+    .task{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; padding:12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.18); margin-top:10px}
+    .task .meta{display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:12px}
+    .pill{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--border)}
+    .p-high{border-color:rgba(239,68,68,.55); color:#fecaca}
+    .p-med{border-color:rgba(245,158,11,.55); color:#fde68a}
+    .p-low{border-color:rgba(34,197,94,.55); color:#bbf7d0}
+    .title{font-weight:800}
+    .notes{color:var(--muted); margin-top:4px; font-size:13px}
+    .actions{display:flex; gap:8px; align-items:center}
+    .iconbtn{padding:8px 10px;border-radius:12px}
+    .done .title{text-decoration:line-through; opacity:.75}
+    .badgeOver{color:#fecaca}
+    .badgeToday{color:#c7d2fe}
+    .badgeSoon{color:#fde68a}
+
+    /* modal */
+    .modalBack{
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      display:none; align-items:center; justify-content:center; padding:16px;
+    }
+    .modal{max-width:520px; width:100%}
+    .modal h2{margin:0 0 10px 0}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .row > *{width:100%}
+    textarea{min-height:90px; resize:vertical}
+    .modalFooter{display:flex; justify-content:flex-end; gap:10px; margin-top:12px}
+    @media (max-width:780px){
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>My Task Site</h1>
+        <p>লোকাল স্টোরেজে সেভ হয়। মানে তুমি ডিলিট না করা পর্যন্ত ভুলবে না।</p>
+      </div>
+      <button class="btn primary" id="openModal">+ Add Task</button>
+    </header>
+
+    <div class="grid">
+      <section class="stats">
+        <div class="card stat">
+          <h3>Total</h3><div class="n" id="sTotal">0</div>
+        </div>
+        <div class="card stat">
+          <h3>Today</h3><div class="n" id="sToday">0</div>
+        </div>
+        <div class="card stat">
+          <h3>Overdue</h3><div class="n" id="sOverdue">0</div>
+        </div>
+        <div class="card stat">
+          <h3>Completed</h3><div class="n" id="sDone">0</div>
+        </div>
+      </section>
+
+      <section class="card toolbar">
+        <div class="left">
+          <input id="search" placeholder="Search task title..." />
+          <select id="filter">
+            <option value="all">All</option>
+            <option value="today">Today</option>
+            <option value="overdue">Overdue</option>
+            <option value="done">Completed</option>
+            <option value="todo">To-do</option>
+          </select>
+        </div>
+        <div class="right">
+          <select id="sort">
+            <option value="createdDesc">Newest</option>
+            <option value="dueAsc">Due date (soon first)</option>
+            <option value="prioDesc">Priority (high first)</option>
+          </select>
+          <button class="btn" id="clearDone">Clear Completed</button>
+        </div>
+      </section>
+
+      <section class="card list">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800">Tasks</div>
+          <div style="color:var(--muted);font-size:12px" id="hint">Saved in this browser</div>
+        </div>
+        <div id="tasks"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modalBack" id="modalBack">
+    <div class="card modal">
+      <h2>Add a task</h2>
+      <div style="display:grid;gap:10px">
+        <input id="tTitle" placeholder="Task title (required)" />
+        <textarea id="tNotes" placeholder="Notes (optional)"></textarea>
+        <div class="row">
+          <input id="tDue" type="date" />
+          <select id="tPrio">
+            <option value="low">Low</option>
+            <option value="med" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+      <div class="modalFooter">
+        <button class="btn" id="closeModal">Cancel</button>
+        <button class="btn primary" id="saveTask">Save</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const STORAGE_KEY = "my_task_site_v1";
+
+  const state = {
+    tasks: load(),
+    search: "",
+    filter: "all",
+    sort: "createdDesc",
+  };
+
+  function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+    catch{ return []; }
+  }
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks)); }
+
+  function todayISO(){
+    const d = new Date();
+    const off = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - off * 60 * 1000);
+    return local.toISOString().slice(0,10);
+  }
+
+  function isOverdue(task){
+    if(!task.dueDate || task.status === "done") return false;
+    return task.dueDate < todayISO();
+  }
+  function isToday(task){
+    if(!task.dueDate || task.status === "done") return false;
+    return task.dueDate === todayISO();
+  }
+
+  function prioScore(p){ return p === "high" ? 3 : p === "med" ? 2 : 1; }
+
+  function badge(task){
+    if(task.status === "done") return "";
+    if(isOverdue(task)) return `<span class="badgeOver">Overdue</span>`;
+    if(isToday(task)) return `<span class="badgeToday">Today</span>`;
+    if(task.dueDate){
+      const t = new Date(todayISO());
+      const d = new Date(task.dueDate);
+      const diff = Math.round((d - t) / (1000*60*60*24));
+      if(diff <= 3) return `<span class="badgeSoon">Due soon</span>`;
+    }
+    return "";
+  }
+
+  function render(){
+    const tasksEl = $("tasks");
+    tasksEl.innerHTML = "";
+
+    const q = state.search.trim().toLowerCase();
+    let list = [...state.tasks];
+
+    if(q) list = list.filter(t => t.title.toLowerCase().includes(q));
+
+    if(state.filter === "today") list = list.filter(isToday);
+    else if(state.filter === "overdue") list = list.filter(isOverdue);
+    else if(state.filter === "done") list = list.filter(t => t.status === "done");
+    else if(state.filter === "todo") list = list.filter(t => t.status !== "done");
+
+    if(state.sort === "createdDesc") list.sort((a,b)=> b.createdAt - a.createdAt);
+    if(state.sort === "dueAsc") list.sort((a,b)=> (a.dueDate || "9999-12-31").localeCompare(b.dueDate || "9999-12-31"));
+    if(state.sort === "prioDesc") list.sort((a,b)=> prioScore(b.priority) - prioScore(a.priority));
+
+    if(list.length === 0){
+      tasksEl.innerHTML = `<div style="padding:14px;color:var(--muted)">No tasks found.</div>`;
+    } else {
+      for(const t of list){
+        const pClass = t.priority === "high" ? "p-high" : t.priority === "med" ? "p-med" : "p-low";
+        const due = t.dueDate ? `Due: ${t.dueDate}` : "No due date";
+        const doneClass = t.status === "done" ? "done" : "";
+        tasksEl.insertAdjacentHTML("beforeend", `
+          <div class="task ${doneClass}">
+            <div style="min-width:0">
+              <div class="title">${escapeHtml(t.title)}</div>
+              ${t.notes ? `<div class="notes">${escapeHtml(t.notes)}</div>` : ""}
+              <div class="meta">
+                <span class="pill ${pClass}">${t.priority.toUpperCase()}</span>
+                <span class="pill">${due}</span>
+                ${badge(t) ? `<span class="pill">${badge(t)}</span>` : ""}
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn iconbtn" title="Toggle done" onclick="toggleDone('${t.id}')">${t.status==="done"?"↩":"✓"}</button>
+              <button class="btn iconbtn" title="Delete" onclick="delTask('${t.id}')">🗑</button>
+            </div>
+          </div>
+        `);
+      }
+    }
+
+    // stats
+    $("sTotal").textContent = state.tasks.length;
+    $("sDone").textContent = state.tasks.filter(t=>t.status==="done").length;
+    $("sOverdue").textContent = state.tasks.filter(isOverdue).length;
+    $("sToday").textContent = state.tasks.filter(isToday).length;
+  }
+
+  function escapeHtml(s){
+    return (s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // actions
+  window.toggleDone = (id) => {
+    const t = state.tasks.find(x=>x.id===id);
+    if(!t) return;
+    t.status = t.status === "done" ? "todo" : "done";
+    save(); render();
+  };
+
+  window.delTask = (id) => {
+    state.tasks = state.tasks.filter(t=>t.id!==id);
+    save(); render();
+  };
+
+  function openModal(){
+    $("modalBack").style.display = "flex";
+    $("tTitle").value = "";
+    $("tNotes").value = "";
+    $("tDue").value = "";
+    $("tPrio").value = "med";
+    setTimeout(()=> $("tTitle").focus(), 0);
+  }
+  function closeModal(){ $("modalBack").style.display = "none"; }
+
+  function addTask(){
+    const title = $("tTitle").value.trim();
+    if(!title){
+      $("tTitle").focus();
+      return;
+    }
+    const task = {
+      id: uid(),
+      title,
+      notes: $("tNotes").value.trim(),
+      dueDate: $("tDue").value || "",
+      priority: $("tPrio").value,
+      status: "todo",
+      createdAt: Date.now()
+    };
+    state.tasks.unshift(task);
+    save();
+    closeModal();
+    render();
+  }
+
+  // listeners
+  $("openModal").addEventListener("click", openModal);
+  $("closeModal").addEventListener("click", closeModal);
+  $("modalBack").addEventListener("click", (e)=>{ if(e.target.id==="modalBack") closeModal(); });
+  $("saveTask").addEventListener("click", addTask);
+
+  $("search").addEventListener("input", (e)=>{ state.search = e.target.value; render(); });
+  $("filter").addEventListener("change", (e)=>{ state.filter = e.target.value; render(); });
+  $("sort").addEventListener("change", (e)=>{ state.sort = e.target.value; render(); });
+
+  $("clearDone").addEventListener("click", ()=>{
+    state.tasks = state.tasks.filter(t=>t.status!=="done");
+    save(); render();
+  });
+
+  // init
+  render();
+</script>
+</body>
+</html>
